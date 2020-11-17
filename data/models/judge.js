@@ -1,34 +1,37 @@
 const { Schema, model } = require("mongoose");
 const autopopulate = require("mongoose-autopopulate");
 
-const reviewSchema = new Schema({
-    metStandard: {
+module.exports = {
+  Review: model(
+    "Review",
+    new Schema({
+      metStandard: {
         type: Boolean,
-        required: true
-    },
-    reviewText: {
+        required: true,
+      },
+      reviewText: {
         type: String,
-        required: true
-    }
-})
-
-const judgeSchema = new Schema({
-    name: {
+        required: true,
+      },
+    })
+  ),
+  Judge: model(
+    "Judge",
+    new Schema({
+      name: {
         type: String,
-        required: true
-    },
-    court: {
+        required: true,
+      },
+      court: {
         type: String,
-        required: true
-    },
-    review: {
+        required: true,
+      },
+      review: {
         type: reviewSchema,
-        required: true
-    }
+        required: true,
+      },
+    })
+  ),
+};
 
-
-});
-
-judgeSchema.plugin(autopopulate);
-
-module.exports = model("Judge", judgeSchema);
+this.Judge.plugin(autopopulate);

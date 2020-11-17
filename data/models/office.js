@@ -1,34 +1,38 @@
 const { Schema, model } = require("mongoose");
 const autopopulate = require("mongoose-autopopulate");
 
-const dutySchema = new Schema({
-    type: String,
-    required: true
-})
-
-const officeSchema = new Schema({
-    title: {
+module.exports = {
+  Duty: model(
+    "Duty",
+    new Schema({
+      description: {
         type: String,
-        required: true
-    },
-    duties: [
+        required: true,
+      },
+    })
+  ),
+  Office: model(
+    "Office",
+    new Schema({
+      title: {
+        type: String,
+        required: true,
+      },
+      duties: [
         {
-            type: dutySchema,
-            required: true
-        }
-    ],
-    candidates: [
+          type: dutySchema,
+          required: true,
+        },
+      ],
+      candidates: [
         {
-            type: Schema.Types.ObjectId,
-            ref: "Candidate",
-            autopopulate: true
-        }
-    ]
-})
-officeSchema.plugin(autopopulate);
+          type: Schema.Types.ObjectId,
+          ref: "Candidate",
+          autopopulate: true,
+        },
+      ],
+    })
+  ),
+};
 
-const officeModel = model("Office", officeSchema);
-const dutyModel = model("Duty", dutySchema);
-module.exports = { officeModel, dutyModel };
-
-
+this.Office.plugin(autopopulate);
