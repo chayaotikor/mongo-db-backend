@@ -9,7 +9,7 @@ type Office {
     _id: ID!
     title: String!
     duties: [Duty!]!
-    candidates: [Candidate!]!
+    candidates: [Candidate]!
 }
 
 type Position {
