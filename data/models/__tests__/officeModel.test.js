@@ -47,7 +47,7 @@ describe("Office Model Tests", () => {
     }
   });
 //NEGATIVE TESTS
-it("Should NOT allow validation of offices missing title", async () => {
+it("Should NOT allow validation of offices with undefined title", async () => {
   const missingTitle = Office({
     title: "",
     duties: ["do things", "do other things", "do something at least"],

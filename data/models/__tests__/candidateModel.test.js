@@ -43,7 +43,7 @@ describe("Candidate Model Tests", () => {
     }
     });
     //NEGATIVE TESTS
-    it("Should NOT allow validation of candidates missing name", async () => {
+    it("Should NOT allow validation of candidates with undefined names", async () => {
          const missingName = Candidate({
            name: "",
            requestedOffice: officeId,
@@ -104,5 +104,78 @@ describe("Candidate Model Tests", () => {
             assert.equal(err.errors.requestedOffice, "CastError: Cast to ObjectId failed for value \"12fh2\" at path \"requestedOffice\"")
         }
     })
-    
+    it('Should NOT allow validation of a candidate without a policy position array', async () => {
+        const emptyPolicyPositions = Candidate({
+          name: "Jane Doe",
+          requestedOffice: officeId,
+          policyPositions: null,
+        });
+
+        try {
+            await emptyPolicyPositions.validate()
+            assert(false, "Allowed validation of a candidate with an empty policy position list.")
+        } catch (err) {
+            assert.equal(
+              err.errors.policyPositions,
+              "Policy positions list required."
+            );
+        }
+    })
+    it('Should NOT allow validation of a candidate whose policy positions list contains undefined duty indexes', async () => {
+                const missingDutyIndex = Candidate({
+                  name: "Jane Doe",
+                  requestedOffice: officeId,
+                  policyPositions: [
+                    {
+                      dutyIndex: 0,
+                      position:
+                        "I would be awesome at this because reasons.",
+                    },
+                    {
+                      dutyIndex: undefined,
+                      position:
+                        "I would do this duty the best anyone ever has!",
+                    },
+                  ],
+                });
+        
+        try {
+            await missingDutyIndex.validate()
+            assert(false, "Allowed validation of a candidate with undefined duty indexes")
+        } catch (err) {
+            assert.equal(
+              err.errors["policyPositions.1.dutyIndex"],
+              "Index of the duty required."
+            );
+        }
+    })
+    it('Should NOT allow validation of a candidate whose policy positions list contains undefined positions', async () => {
+                const missingDutyIndex = Candidate({
+                  name: "Jill Doe",
+                  requestedOffice: officeId,
+                  policyPositions: [
+                    {
+                      dutyIndex: 0,
+                      position:
+                        "",
+                    },
+                    {
+                      dutyIndex: 1,
+                      position:
+                        "I would do this duty the best anyone ever has!",
+                    },
+                  ],
+                });
+        
+        try {
+            await missingDutyIndex.validate()
+            assert(false, "Allowed validation of a candidate with undefined policy positions")
+        } catch (err) {
+            assert.equal(
+              err.errors["policyPositions.0.position"],
+              "Policy position on a specified duty required."
+            );
+        }
+    })
+
 });
