@@ -21,6 +21,7 @@ describe("Candidate Model Tests", () => {
         done();
     });
     });
+    //POSITIVE TESTS
     it("Should save a correctly formatted candidate and return the doc", async () => {
     const newCandidate = Candidate({
       name: "Joe Schmoe",
@@ -42,6 +43,7 @@ describe("Candidate Model Tests", () => {
       assert(false, error.message);
     }
     });
+    
     //NEGATIVE TESTS
     it("Should NOT allow validation of candidates with undefined names", async () => {
          const missingName = Candidate({

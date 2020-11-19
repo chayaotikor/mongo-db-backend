@@ -46,6 +46,7 @@ describe("Office Model Tests", () => {
       assert(false, "Error saving doc to database.");
     }
   });
+  
 //NEGATIVE TESTS
 it("Should NOT allow validation of offices with undefined title", async () => {
   const missingTitle = Office({
