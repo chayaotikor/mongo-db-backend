@@ -1,26 +1,34 @@
-const chai = require("chai");
+const {assert, expect} = require("chai");
 const mongoose = require("mongoose");
-const expect = chai.expect;
 const Office = require("../officeModel");
-const Candidate = require("../candidateModel");
-const { assert } = require("chai");
 
-
-  before((done) => {
-    mongoose.connect("mongodb://localhost/testDatabase", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    const db = mongoose.connection;
-    db.on("error", console.error.bind(console, "connection error"));
-    db.once("open", () => {
-      console.log("Connected to test database!");
+before((done) => {
+       mongoose.models = {};
+       mongoose.modelSchemas = {};
+      mongoose.connection.on(
+        "error",
+        console.error.bind(console, "connection error")
+      );
+      mongoose.connection.once("open", () => {
+        console.log("Connected to test database!");
+      });
+      mongoose.connect("mongodb://localhost/testDatabase", {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
       done();
     });
-  });
-describe("Testing Office Model Validation", () => {
+    after((done) => {
+      mongoose.connection.close(() => {
+        done();
+      });
+    });
+
+
+describe("Office Model Tests", () => {
+
   //POSITIVE TESTS
-  it("Should save the new office to the DB and return the saved doc", async () => {
+  it("Should save a correctly formatted office and return the saved doc", async () => {
     const newOffice = Office({
       title: "Senator",
       duties: ["do things", "do other things", "do something at least"],
@@ -46,7 +54,7 @@ it("Should NOT allow validation of offices missing title", async () => {
     candidates: [],
   });
   try {
-    await missingTitle.validate();
+    await missingTitle.validate()
     assert(false, "Empty office title accepted.");
   } catch (err) {
     assert.equal(err.errors.title, "The title of the office is required.");
