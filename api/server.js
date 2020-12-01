@@ -9,12 +9,7 @@ const server = express();
 configureMiddleware(server);
 
 server.use(
-  "/graphql",
-  graphqlHTTP({
-    schema: schema,
-    rootValue: rootResolver,
-    graphiql: true,
-  })
+//remove graphQL and use traditional routes
 );
 
 module.exports = server;
