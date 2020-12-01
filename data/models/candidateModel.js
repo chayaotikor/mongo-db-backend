@@ -13,19 +13,7 @@ const candidateSchema = new Schema({
     required: [true, "Provided office ID is invalid."]
   },
   policyPositions:{
-    type: [
-    {
-      dutyIndex: {
-        type: Number ,
-        required: [true, "Index of the duty required."]
-
-      },
-      position: {
-        type: String,
-        required: [true, "Policy position on a specified duty required." ],
-      },
-    },
-    ],
+    type: Buffer,
   required: [true, "Policy positions list required."]
   }
 });

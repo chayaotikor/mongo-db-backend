@@ -11,7 +11,7 @@ const judgeSchema = new Schema({
     required: [true, "Court that judge serves required."],
   },
   review: {
-    type: String,
+    type: Buffer,
     required: [true, "Review of judge required."],
   },
 });

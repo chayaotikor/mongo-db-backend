@@ -7,12 +7,7 @@ const officeSchema = new Schema({
     required: [true, "The title of the office is required."],
   },
   duties: {
-    type: [
-      {
-        type: String,
-        required: [true, "Duty description cannot be blank."],
-      },
-    ],
+    type: Buffer,
     required: [true, "A duties list for the office is required."],
   },
   candidates: [
