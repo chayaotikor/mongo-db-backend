@@ -1,14 +1,14 @@
 const { Schema, model } = require("mongoose");
 
 const proposalSchema = new Schema({
-  name: {
+  proposalName: {
     type: String,
-    required: [true, "Name of the proposal required."],
+    required: [true, "Proposal name required."],
   },
 
-  details: {
+  proposalDetails: {
     type: Buffer,
-    required: [true, "Details of the proposal required."],
+    required: [true, "Proposal details file required."],
   },
 });
 

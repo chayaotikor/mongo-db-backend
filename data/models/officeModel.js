@@ -2,13 +2,13 @@ const { Schema, model } = require("mongoose");
 const autopopulate = require("mongoose-autopopulate");
 
 const officeSchema = new Schema({
-  title: {
+  officeTitle: {
     type: String,
-    required: [true, "The title of the office is required."],
+    required: [true, "Office title required."],
   },
-  duties: {
+  officeDuties: {
     type: Buffer,
-    required: [true, "A duties list for the office is required."],
+    required: [true, "Office duties file required."],
   },
   candidates: [
     {

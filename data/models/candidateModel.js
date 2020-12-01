@@ -4,17 +4,17 @@ const autopopulate = require("mongoose-autopopulate");
 const candidateSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Name of candidate required."],
+    required: [true, "Candidate name required."],
   },
   requestedOffice: {
     type: Schema.Types.ObjectId,
     ref: "Office",
     autopopulate: { select: "title" },
-    required: [true, "Provided office ID is invalid."]
+    required: [true, "Valid office ID required."]
   },
   policyPositions:{
     type: Buffer,
-  required: [true, "Policy positions list required."]
+  required: [true, "Policy positions file required."]
   }
 });
 
