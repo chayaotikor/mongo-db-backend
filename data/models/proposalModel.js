@@ -10,6 +10,11 @@ const proposalSchema = new Schema({
     type: Buffer,
     required: [true, "Proposal details file required."],
   },
+
+  proposalLanguage: {
+        type: Buffer,
+    required: [true, "Proposal language file required."],
+  }
 });
 
 module.exports = model("Proposal", proposalSchema);
