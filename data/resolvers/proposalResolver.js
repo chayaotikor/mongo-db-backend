@@ -77,7 +77,7 @@ module.exports = {
       } else {
           const keys = Object.keys(content)
           for (let i = 0; i < keys.length; i++){
-              const property = keys[i]
+              let property = keys[i]
               proposal[property] = content[property];
           }
         await proposal.save();
