@@ -27,7 +27,7 @@ describe("Office Model Tests", () => {
     //testing duties pdf hashing
     let testHash1 = crypto.createHash("sha256");
     testHash1.update(result.officeDuties);
-    let dutiesResultHex1 = testHash1.digest("hex");
+    let dutiesResultHex = testHash1.digest("hex");
 
     let testHash2 = crypto.createHash("sha256");
     testHash2.update(
@@ -35,10 +35,10 @@ describe("Office Model Tests", () => {
         path.resolve(__dirname, "../../../pdfs/governor_duties.pdf")
       )
     );
-    let expectedResultHex1 = testHash2.digest("hex");
+    let expectedResultHex = testHash2.digest("hex");
     try {
       assert.equal(result.officeTitle, "Governor");
-      assert.equal(dutiesResultHex1, expectedResultHex1);
+      assert.equal(dutiesResultHex, expectedResultHex);
     } catch (error) {
       assert(false, error.message);
     }

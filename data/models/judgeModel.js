@@ -10,7 +10,7 @@ const judgeSchema = new Schema({
     type: String,
     required: [true, "Court served required."],
   },
-  review: {
+  performanceReview: {
     type: Buffer,
     required: [true, "Judge review file required."],
   },
