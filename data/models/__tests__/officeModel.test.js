@@ -7,7 +7,7 @@ const Office = require("../officeModel");
 let officeExample = {
   officeTitle: "Governor",
   officeDuties: null,
-  candidates: []
+  candidates: [],
 };
 
 describe("Office Model Tests", () => {
@@ -36,9 +36,12 @@ describe("Office Model Tests", () => {
       )
     );
     let expectedResultHex1 = testHash2.digest("hex");
-
-    assert.equal(result.officeTitle, "Governor");
-    assert.equal(dutiesResultHex1, expectedResultHex1);
+    try {
+      assert.equal(result.officeTitle, "Governor");
+      assert.equal(dutiesResultHex1, expectedResultHex1);
+    } catch (error) {
+      assert(false, error.message);
+    }
   });
 
   //NEGATIVE TESTS
@@ -57,8 +60,8 @@ describe("Office Model Tests", () => {
 
   it("Should NOT allow validation of office without duty file", async () => {
     let clonedOffice = Object.assign({}, officeExample);
-      clonedOffice.officeDuties = undefined;
-      let missingDuties = Office(clonedOffice)
+    clonedOffice.officeDuties = undefined;
+    let missingDuties = Office(clonedOffice);
     try {
       await missingDuties.validate();
       assert(false, "Empty duties list accepted.");
@@ -66,5 +69,4 @@ describe("Office Model Tests", () => {
       assert.equal(err.errors.officeDuties, "Office duties file required.");
     }
   });
-
 });
