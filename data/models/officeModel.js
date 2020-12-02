@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const Candidate = require('./candidateModel')
 const autopopulate = require("mongoose-autopopulate");
 
 const officeSchema = new Schema({
@@ -13,7 +14,7 @@ const officeSchema = new Schema({
   candidates: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Candidate",
+      ref: Candidate,
       autopopulate: { select: "name" },
       required: false,
     },

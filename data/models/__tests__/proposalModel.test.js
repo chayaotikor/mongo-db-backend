@@ -28,10 +28,10 @@ describe("Proposal Model Tests", () => {
 
     let result = await newProposal.save();
 
-    //testing details pdf
+    //testing details pdf hashing
     let testHash1 = crypto.createHash("sha256");
     testHash1.update(result.proposalDetails)
-    let detailsResultHex1 = testHash1.digest('hex')
+    let detailsResultHex = testHash1.digest('hex')
 
     let testHash2 = crypto.createHash("sha256");
     testHash2.update(fs.readFileSync(
@@ -39,10 +39,10 @@ describe("Proposal Model Tests", () => {
     ))
     let expectedResultHex1 = testHash2.digest('hex')
 
-    //testing language pdf
+    //testing language pdf hashing
     let testHash3 = crypto.createHash("sha256");
     testHash3.update(result.proposalLanguage)
-    let detailsResultHex2 = testHash3.digest('hex')
+    let languageResultHex = testHash3.digest('hex')
 
     let testHash4 = crypto.createHash("sha256");
     testHash4.update(fs.readFileSync(
@@ -51,8 +51,8 @@ describe("Proposal Model Tests", () => {
     let expectedResultHex2 = testHash4.digest('hex')
 
     assert.equal(result.proposalName, "76");
-    assert.equal(detailsResultHex1, expectedResultHex1);
-    assert.equal(detailsResultHex2, expectedResultHex2);
+    assert.equal(detailsResultHex, expectedResultHex1);
+    assert.equal(languageResultHex, expectedResultHex2);
   });
 
   //NEGATIVE TESTS

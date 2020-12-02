@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const Office = require('./officeModel')
 const autopopulate = require("mongoose-autopopulate");
 
 const candidateSchema = new Schema({
@@ -9,13 +10,13 @@ const candidateSchema = new Schema({
   requestedOffice: {
     type: Schema.Types.ObjectId,
     ref: "Office",
-    autopopulate: { select: "title" },
-    required: [true, "Valid office ID required."]
+    autopopulate: { select: "officeTitle" },
+    required: [true, "Valid office ID required."],
   },
-  policyPositions:{
+  policyPositions: {
     type: Buffer,
-  required: [true, "Policy positions file required."]
-  }
+    required: [true, "Policy positions file required."]
+  },
 });
 
 candidateSchema.plugin(autopopulate);

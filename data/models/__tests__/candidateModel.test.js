@@ -1,6 +1,6 @@
-// const { assert, expect } = require("chai");
-// const Office = require("../officeModel");
-// const Candidate = require("../candidateModel");
+const { assert, expect } = require("chai");
+const Office = require("../officeModel");
+const Candidate = require("../candidateModel");
 
 
 
