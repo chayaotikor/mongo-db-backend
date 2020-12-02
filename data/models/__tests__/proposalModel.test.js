@@ -1,133 +1,95 @@
 const { assert, expect } = require("chai");
 const Proposal = require("../proposalModel");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+
 
 let proposalExample = {
-  name: "AA",
-  approvalEffect: "If voters approve proposal AA, good things will happen.",
-  details: {
-    explanation:
-      "Proposal AA seeks to make things happen by fixing that other thing that happened.",
-    analysis: "Here is an analysis of the potential effects of Proposal AA.",
-  },
-  arguments: {
-    proponentSummary: "Proposal AA is great!",
-    proponentDetailed:
-      "Here is all the great things proposal AA will do if passed.",
-    opponentSummary: "Proposal AA is not good.",
-    opponentDetailed:
-      "Proposal AA will lead to a very bad thing. It will also not fix the first bad thing.",
-  },
-  language: {
-    title: "Here is the title language of the proposal.",
-    text: "Here is the text language of the proposal.",
-  },
-  fiscalImpact: "Proposal AA will have no fiscal impact.",
+  proposalName: "76",
+  proposalDetails: null,
+  proposalLanguage: null,
 };
 
 describe("Proposal Model Tests", () => {
+  before((done) => {
+    proposalExample.proposalDetails = fs.readFileSync(
+      path.resolve(__dirname, "../../../pdfs/amendment_76.pdf")
+    );
+
+    proposalExample.proposalLanguage = fs.readFileSync(
+      path.resolve(__dirname, "../../../pdfs/amendment_76_language.pdf")
+    );
+    done();
+  });
   //POSITIVE TESTS
   it("Should save a correctly formatted proposal and return the doc", async () => {
     const newProposal = Proposal(proposalExample);
 
     let result = await newProposal.save();
 
-    assert.equal(result.name, "AA");
-    assert.equal(
-      result.approvalEffect,
-      "If voters approve proposal AA, good things will happen."
-    );
-    assert.equal(
-      result.details.explanation,
-      "Proposal AA seeks to make things happen by fixing that other thing that happened."
-    );
-    assert.equal(
-      result.details.analysis,
-      "Here is an analysis of the potential effects of Proposal AA."
-    );
-    assert.equal(result.arguments.proponentSummary, "Proposal AA is great!");
-    assert.equal(
-      result.arguments.proponentDetailed,
-      "Here is all the great things proposal AA will do if passed."
-    );
-    assert.equal(result.arguments.opponentSummary, "Proposal AA is not good.");
-    assert.equal(
-      result.arguments.opponentDetailed,
-      "Proposal AA will lead to a very bad thing. It will also not fix the first bad thing."
-    );
-    assert.equal(
-      result.language.title,
-      "Here is the title language of the proposal."
-    );
-    assert.equal(
-      result.language.text,
-      "Here is the text language of the proposal."
-    );
-    assert.equal(
-      result.fiscalImpact,
-      "Proposal AA will have no fiscal impact."
-    );
+    //testing details pdf
+    let testHash1 = crypto.createHash("sha256");
+    testHash1.update(result.proposalDetails)
+    let detailsResultHex1 = testHash1.digest('hex')
+
+    let testHash2 = crypto.createHash("sha256");
+    testHash2.update(fs.readFileSync(
+      path.resolve(__dirname, "../../../pdfs/amendment_76.pdf")
+    ))
+    let expectedResultHex1 = testHash2.digest('hex')
+
+    //testing language pdf
+    let testHash3 = crypto.createHash("sha256");
+    testHash3.update(result.proposalLanguage)
+    let detailsResultHex2 = testHash3.digest('hex')
+
+    let testHash4 = crypto.createHash("sha256");
+    testHash4.update(fs.readFileSync(
+      path.resolve(__dirname, "../../../pdfs/amendment_76_language.pdf")
+    ))
+    let expectedResultHex2 = testHash4.digest('hex')
+
+    assert.equal(result.proposalName, "76");
+    assert.equal(detailsResultHex1, expectedResultHex1);
+    assert.equal(detailsResultHex2, expectedResultHex2);
   });
-    
-  //NEGATIVE
+
+  //NEGATIVE TESTS
     it("Should NOT allow validation of a proposal with an undefined name", async () => {
         let clonedProposal = Object.assign({}, proposalExample);
-        clonedProposal.name = undefined
-        
+        clonedProposal.proposalName = undefined
+
       const missingName = Proposal(clonedProposal);
-        
+
         try {
             await missingName.validate();
             assert(false, "Allowed validation of proposal with missing name")
         } catch (err) {
-            assert.equal(err.errors.name, "Name of the proposal required.");
+            assert.equal(err.errors.proposalName, "Proposal name required.");
         }
-  })  
-    it("Should NOT allow validation of a proposal with an undefined approval effect", async () => {
-        let clonedProposal = Object.assign({}, proposalExample);
-        clonedProposal.approvalEffect = undefined
-      const missingEffect = Proposal(clonedProposal);
-        
-        try {
-            await missingEffect.validate();
-            assert(false, "Allowed validation of proposal with undefined approval effect")
-        } catch (err) {
-            assert.equal(err.errors.approvalEffect, "Effect of proposal required.");
-        }
-  })  
-    it("Should NOT allow validation of a proposal with undefined details", async () => {
-        let clonedProposal = Object.assign({}, proposalExample);
-        clonedProposal.details = undefined;
-        const missingDetails = Proposal(clonedProposal);
-        
-        try {
-            await missingDetails.validate();
-            assert(false, "Allowed validation of proposal with undefined details.")
-        } catch (err) {
-            assert.equal(err.errors.details, "Details of proposal required.");
-        }
-  })  
-        it("Should NOT allow validation of a proposal with undefined arguments", async () => {
-          let clonedProposal = Object.assign({}, proposalExample);
-          clonedProposal.arguments = undefined;
-          const missingArguments = Proposal(clonedProposal);
+    })
+          it("Should NOT allow validation of a proposal with undefined details", async () => {
+            let clonedProposal = Object.assign({}, proposalExample);
+            clonedProposal.proposalDetails = undefined;
+            const missingLanguage = Proposal(clonedProposal);
 
-          try {
-            await missingArguments.validate();
-            assert(
-              false,
-              "Allowed validation of proposal with undefined arguments."
-            );
-          } catch (err) {
-            assert.equal(
-              err.errors.arguments,
-              "For/Against arguments required."
-            );
-          }
-        });  
-    
+            try {
+              await missingLanguage.validate();
+              assert(
+                false,
+                "Allowed validation of proposal with undefined language."
+              );
+            } catch (err) {
+              assert.equal(
+                err.errors.proposalDetails,
+                "Proposal details file required."
+              );
+            }
+          });
         it("Should NOT allow validation of a proposal with undefined language", async () => {
           let clonedProposal = Object.assign({}, proposalExample);
-          clonedProposal.language = undefined;
+          clonedProposal.proposalLanguage = undefined;
           const missingLanguage = Proposal(clonedProposal);
 
           try {
@@ -137,27 +99,10 @@ describe("Proposal Model Tests", () => {
               "Allowed validation of proposal with undefined language."
             );
           } catch (err) {
-            assert.equal(err.errors.language, "Proposal language required.");
-          }
-        });  
-        it("Should NOT allow validation of a proposal with undefined fiscal impact", async () => {
-          let clonedProposal = Object.assign({}, proposalExample);
-          clonedProposal.fiscalImpact = undefined;
-          const missingImpact = Proposal(clonedProposal);
-
-          try {
-            await missingImpact.validate();
-            assert(
-              false,
-              "Allowed validation of proposal with undefined fiscalImpact."
-            );
-          } catch (err) {
             assert.equal(
-              err.errors.fiscalImpact,
-              "Fiscal impact analysis required."
+              err.errors.proposalLanguage,
+              "Proposal language file required."
             );
           }
-        });  
-
-    
+        });
 });
