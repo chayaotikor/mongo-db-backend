@@ -27,14 +27,14 @@ module.exports = {
 
   addOffice: async ({ content }) => {
     const officeContent = new Office({
-      title: content.title,
-      duties: content.duties,
+      officeTitle: content.officeTitle,
+      officeDuties: content.officeDuties,
       candidates: [],
     });
     try {
       if (
-        officeContent.title === "undefined" ||
-        officeContent.duties === "undefined"
+        officeContent.officeTitle === "undefined" ||
+        officeContent.officeDuties === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -52,15 +52,11 @@ module.exports = {
       if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.title) {
-          office.title = content.title;
-        }
-        if (content.duties) {
-          office.duties = content.duties;
-        }
-        if (content.candidates) {
-          office.candidates = content.candidates;
-        }
+          const keys = Object.keys(content);
+          for (let i = 0; i < keys.length; i++) {
+            let property = keys[i];
+            office[property] = content[property];
+          }
         await office.save();
         return { ...office._doc };
       }

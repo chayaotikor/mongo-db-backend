@@ -27,37 +27,15 @@ module.exports = {
 
   addProposal: async ({ content }) => {
     const proposalContent = new Proposal({
-      name: content.name,
-      approvalEffect: content.approvalEffect,
-      details: {
-        explanation: content.details.explanation,
-        analysis: content.details.analysis,
-      },
-      arguments: {
-        proponentSummary: content.arguments.proponentSummary,
-        proponentDetailed: content.arguments.proponentDetailed,
-        opponentSummary: content.arguments.opponentSummary,
-        opponentDetailed: content.arguments.opponentDetailed,
-        },
-        language: {
-            title: content.language.title,
-            text: content.language.text
-        },
-        fiscalImpact: content.fiscalImpact
+      proposalName: content.proposalName,
+      proposalDetails: content.proposalDetails,
+      proposalLanguage: content.proposalLanguage
     });
     try {
       if (
-        proposalContent.name === "undefined" ||
-        proposalContent.approvalEffect === "undefined" ||
-        proposalContent.details.explanation === "undefined" ||
-        proposalContent.details.analysis === "undefined" ||
-        proposalContent.arguments.proponentSummary === "undefined" ||
-        proposalContent.arguments.proponentDetailed === "undefined" ||
-        proposalContent.arguments.opponentSummary === "undefined" ||
-        proposalContent.arguments.opponentDetailed === "undefined" || 
-        proposalContent.language.title === "undefined" || 
-        proposalContent.language.text === "undefined" || 
-        proposalContent.fiscalImpact === "undefined" 
+        proposalContent.proposalName === "undefined" ||
+        proposalContent.proposalDetails === "undefined" ||
+        proposalContent.proposalLanguage == "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }

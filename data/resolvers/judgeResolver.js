@@ -30,13 +30,13 @@ module.exports = {
     const judgeContent = new Judge({
       name: content.name,
       court: content.court,
-      review: content.review,
+      performanceReview: content.performanceReview,
     });
     try {
       if (
         judgeContent.name === "undefined" ||
         judgeContent.court === "undefined" ||
-        judgeContent.review === "undefined"
+        judgeContent.performanceReview === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -54,15 +54,11 @@ module.exports = {
       if (!judge) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.name) {
-          judge.name = content.name;
-        }
-        if (content.court) {
-          judge.court = content.court;
-        }
-        if (content.review) {
-          judge.review = content.review;
-        }
+          const keys = Object.keys(content);
+          for (let i = 0; i < keys.length; i++) {
+            let property = keys[i];
+            judge[property] = content[property];
+          }
         await judge.save();
         return { ...judge._doc };
       }

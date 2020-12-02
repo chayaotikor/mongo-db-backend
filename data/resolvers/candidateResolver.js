@@ -30,13 +30,13 @@ module.exports = {
   addCandidate: async ({ content, officeId }, req) => {
     const candidateContent = new Candidate({
       name: content.name,
-      policyPositions: content.policyPositions,
+      candidateQuestionnaire: content.candidateQuestionnaire,
       requestedOffice: officeId,
     });
     try {
       if (
         candidateContent.name === "undefined" ||
-          candidateContent.policyPositions === "undefined" ||
+          candidateContent.candidateQuestionnaire === "undefined" ||
           officeId === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
@@ -61,12 +61,11 @@ module.exports = {
       if (!candidate) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.name) {
-          candidate.name = content.name;
-        }
-        if (content.policyPositions) {
-          candidate.policyPositions = content.policyPositions;
-        }
+          const keys = Object.keys(content);
+          for (let i = 0; i < keys.length; i++) {
+            let property = keys[i];
+            candidate[property] = content[property];
+          }
         await candidate.save();
         return { ...candidate._doc };
       }
