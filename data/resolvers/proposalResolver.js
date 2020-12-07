@@ -13,7 +13,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getProposal: async ({ id }) => {
+  getProposal: async (id) => {
     try {
       const proposal = await Proposal.findOne({ _id: id });
       if (!proposal) {
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
 
-  addProposal: async ({ content }) => {
+  addProposal: async (content) => {
     const proposalContent = new Proposal({
       proposalName: content.proposalName,
       proposalDetails: content.proposalDetails,
@@ -47,7 +47,7 @@ module.exports = {
     }
   },
 
-  updateProposal: async ({ content, id }) => {
+  updateProposal: async (content, id) => {
     try {
       const proposal = await Proposal.findOne({ _id: id });
       if (!proposal) {
@@ -66,13 +66,14 @@ module.exports = {
     }
   },
 
-  deleteProposal: async ({ proposalId }) => {
+  deleteProposal: async (proposalId) => {
     try {
       const proposal = await Proposal.findOne({ _id: proposalId });
       if (!proposal) {
         errorHandler(responseStatus.notFound);
       } else {
         proposal.remove();
+        return await module.exports.getAllProposals()
       }
     } catch (err) {
       errorHandler(err);
