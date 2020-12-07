@@ -15,7 +15,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getCandidate: async ({ id }) => {
+  getCandidate: async ( id ) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
@@ -27,7 +27,7 @@ module.exports = {
     }
   },
 
-  addCandidate: async ({ content, officeId }, req) => {
+  addCandidate: async (content, officeId) => {
     const candidateContent = new Candidate({
       name: content.name,
       candidateQuestionnaire: content.candidateQuestionnaire,
@@ -55,7 +55,7 @@ module.exports = {
     }
   },
 
-  updateCandidate: async ({ content, id }) => {
+  updateCandidate: async ( content, id ) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
@@ -74,7 +74,7 @@ module.exports = {
     }
   },
 
-  deleteCandidate: async ({ candidateId, officeId }) => {
+  deleteCandidate: async ( candidateId, officeId ) => {
     try {
       const candidate = await Candidate.findOne({ _id: candidateId });
       const office = await Office.findById(officeId);
@@ -84,6 +84,9 @@ module.exports = {
       } else if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
+        office.candidates = office.candidates.filter(candidate => {
+          return candidate._id !== candidateId
+        })
         candidate.remove();
         await office.save();
         return { ...office._doc };
