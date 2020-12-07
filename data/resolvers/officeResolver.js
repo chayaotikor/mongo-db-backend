@@ -1,5 +1,5 @@
 const Office = require("../models/officeModel")
-const errorHandler = require("../../config/errorHandler")
+const errorHandler = require("../../middleware/errorHandler");
 
 module.exports = {
   getAllOffices: async () => {

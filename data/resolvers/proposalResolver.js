@@ -1,5 +1,5 @@
 const Proposal = require("../models/proposalModel");
-const errorHandler = require("../../config/errorHandler");
+const errorHandler = require("../../middleware/errorHandler");
 
 module.exports = {
   getAllProposals: async () => {

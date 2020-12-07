@@ -1,5 +1,5 @@
 const Judge = require("../models/judgeModel");
-const errorHandler = require("../../config/errorHandler");
+const errorHandler = require("../../middleware/errorHandler");
 const responseStatus = require("../../config/responseStatuses");
 
 module.exports = {

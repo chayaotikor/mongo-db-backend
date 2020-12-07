@@ -1,4 +1,4 @@
-const responseStatus = require("./responseStatuses");
+const responseStatus = require("../config/responseStatuses");
 
 function errorHandler(error) {
   switch (error) {
