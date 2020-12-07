@@ -95,8 +95,8 @@ describe("Testing proposal collection resolvers", () => {
     try {
       const result = await proposalResolver.deleteProposal(proposalId);
 
-      assert.equal(result.length, 1);
-      assert.equal(result[0].proposalName, "ee");
+      assert.equal(result.deletedCount, 1);
+
     } catch (error) {
       assert(false, error.message);
     }

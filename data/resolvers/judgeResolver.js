@@ -69,13 +69,12 @@ module.exports = {
 
   deleteJudge: async (judgeId) => {
     try {
-      const judge = await Judge.findOne({ _id: judgeId });
-      if (!judge) {
+      const judge = await Judge.deleteOne({ _id: judgeId });
+      if (judge.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else {
-        judge.remove();
-        let result = await module.exports.getAllJudges()
-        return result
+
+        return judge
       }
     } catch (err) {
       errorHandler(err);

@@ -68,12 +68,11 @@ module.exports = {
 
   deleteProposal: async (proposalId) => {
     try {
-      const proposal = await Proposal.findOne({ _id: proposalId });
-      if (!proposal) {
+      const proposal = await Proposal.deleteOne({ _id: proposalId });
+      if (proposal.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else {
-        proposal.remove();
-        return await module.exports.getAllProposals()
+        return {...proposal}
       }
     } catch (err) {
       errorHandler(err);

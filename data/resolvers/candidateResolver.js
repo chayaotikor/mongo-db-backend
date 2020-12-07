@@ -76,10 +76,10 @@ module.exports = {
 
   deleteCandidate: async (candidateId, officeId) => {
     try {
-      const candidate = await Candidate.findOne({ _id: candidateId });
+      const candidate = await Candidate.deleteOne({ _id: candidateId });
       const office = await Office.findById(officeId);
 
-      if (!candidate) {
+      if (candidate.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else if (!office) {
         errorHandler(responseStatus.notFound);
@@ -87,9 +87,8 @@ module.exports = {
         office.candidates = office.candidates.filter((candidate) => {
           return candidate._id !== candidateId;
         });
-        candidate.remove();
         await office.save();
-        return { ...office._doc };
+        return { office, candidate };
       }
     } catch (err) {
       errorHandler(err);
