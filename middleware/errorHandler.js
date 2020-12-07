@@ -1,22 +1,35 @@
 const responseStatus = require("../config/responseStatuses");
 
-function errorHandler(error) {
+function errorHandler(error, req, res, next) {
   switch (error) {
     case responseStatus.badRequest:
-      throw Error("Required fields cannot be blank.");
+    res
+    .json({statusCode: error,
+        message: "Required fields cannot be blank."});
     case responseStatus.forbiddenAccess:
-      throw Error("You are not authorized.");
+    res
+    .json({statusCode: error,
+        message: "You are not authorized."});
     case responseStatus.notFound:
-      throw Error("This resource does not exist.");
+    res
+    .json({statusCode: error,
+        message: "This resource does not exist."});
     case responseStatus.conflict:
-      throw Error("User already exists.");
+    res
+    .json({statusCode: error,
+        message: "Resource already exists."});
     case responseStatus.serverError:
-      throw Error(
+    res
+    .json({statusCode: error,
+        message: 
         "The request could not be completed. Please try again."
-      );
+      });
     default:
-      throw Error(error.message);
+    res
+    .json({statusCode: error,
+        message: error.message});
   }
+  next()
 }
 
 module.exports = errorHandler;

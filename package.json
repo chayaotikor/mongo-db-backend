@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "mocha './data/**/*.test.js' --watch "
+    "test": "mocha './data/routes/**/*.test.js' --watch "
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
