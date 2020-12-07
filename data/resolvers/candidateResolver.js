@@ -15,7 +15,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getCandidate: async ( id ) => {
+  getCandidate: async (id) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
@@ -36,8 +36,8 @@ module.exports = {
     try {
       if (
         candidateContent.name === "undefined" ||
-          candidateContent.candidateQuestionnaire === "undefined" ||
-          officeId === "undefined"
+        candidateContent.candidateQuestionnaire === "undefined" ||
+        officeId === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -55,17 +55,17 @@ module.exports = {
     }
   },
 
-  updateCandidate: async ( content, id ) => {
+  updateCandidate: async (content, id) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
         errorHandler(responseStatus.notFound);
       } else {
-          const keys = Object.keys(content);
-          for (let i = 0; i < keys.length; i++) {
-            let property = keys[i];
-            candidate[property] = content[property];
-          }
+        const keys = Object.keys(content);
+        for (let i = 0; i < keys.length; i++) {
+          let property = keys[i];
+          candidate[property] = content[property];
+        }
         await candidate.save();
         return { ...candidate._doc };
       }
@@ -74,7 +74,7 @@ module.exports = {
     }
   },
 
-  deleteCandidate: async ( candidateId, officeId ) => {
+  deleteCandidate: async (candidateId, officeId) => {
     try {
       const candidate = await Candidate.findOne({ _id: candidateId });
       const office = await Office.findById(officeId);
@@ -84,9 +84,9 @@ module.exports = {
       } else if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
-        office.candidates = office.candidates.filter(candidate => {
-          return candidate._id !== candidateId
-        })
+        office.candidates = office.candidates.filter((candidate) => {
+          return candidate._id !== candidateId;
+        });
         candidate.remove();
         await office.save();
         return { ...office._doc };

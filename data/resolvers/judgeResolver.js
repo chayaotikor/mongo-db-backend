@@ -14,7 +14,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getJudge: async ({ id }) => {
+  getJudge: async (id) => {
     try {
       const judge = await Judge.findOne({ _id: id });
       if (!judge) {
@@ -26,7 +26,7 @@ module.exports = {
     }
   },
 
-  addJudge: async ({ content }) => {
+  addJudge: async (content) => {
     const judgeContent = new Judge({
       name: content.name,
       court: content.court,
@@ -48,7 +48,7 @@ module.exports = {
     }
   },
 
-  updateJudge: async ({ content, id }) => {
+  updateJudge: async (content,id) => {
     try {
       const judge = await Judge.findOne({ _id: id });
       if (!judge) {
@@ -67,13 +67,15 @@ module.exports = {
     }
   },
 
-  deleteJudge: async ({ judgeId }) => {
+  deleteJudge: async (judgeId) => {
     try {
       const judge = await Judge.findOne({ _id: judgeId });
       if (!judge) {
         errorHandler(responseStatus.notFound);
       } else {
         judge.remove();
+        let result = await module.exports.getAllJudges()
+        return result
       }
     } catch (err) {
       errorHandler(err);

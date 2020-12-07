@@ -1,4 +1,5 @@
-const Office = require("../models/officeModel")
+const Office = require("../models/officeModel");
+const Candidate = require("../models/candidateModel")
 const errorHandler = require("../../middleware/errorHandler");
 
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getOffice: async ({ id }) => {
+  getOffice: async (id) => {
     try {
       const office = await Office.findOne({ _id: id });
       if (!office) {
@@ -25,7 +26,7 @@ module.exports = {
     }
   },
 
-  addOffice: async ({ content }) => {
+  addOffice: async (content) => {
     const officeContent = new Office({
       officeTitle: content.officeTitle,
       officeDuties: content.officeDuties,
@@ -46,17 +47,17 @@ module.exports = {
     }
   },
 
-  updateOffice: async ({ content, id }) => {
+  updateOffice: async (content, id) => {
     try {
       const office = await Office.findOne({ _id: id });
       if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
-          const keys = Object.keys(content);
-          for (let i = 0; i < keys.length; i++) {
-            let property = keys[i];
-            office[property] = content[property];
-          }
+        const keys = Object.keys(content);
+        for (let i = 0; i < keys.length; i++) {
+          let property = keys[i];
+          office[property] = content[property];
+        }
         await office.save();
         return { ...office._doc };
       }
@@ -65,16 +66,28 @@ module.exports = {
     }
   },
 
-  deleteOffice: async ({ officeId }) => {
+  deleteOffice: async (officeId) => {
     try {
       const office = await Office.findOne({ _id: officeId });
       if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
+        await Candidate.deleteMany({ requestedOffice: officeId });
         office.remove();
+  
+        let candidates = await Candidate.find()
+        let offices = await module.exports.getAllOffices();
+        
+
+        return {offices, candidates};
       }
     } catch (err) {
       errorHandler(err);
     }
   },
+  // cleanOfficeCandidates: async (officeId) => {
+
+
+  //   return candidates
+  // },
 };
