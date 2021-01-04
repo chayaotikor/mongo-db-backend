@@ -26,8 +26,7 @@ function errorHandler(error, req, res, next) {
       });
     default:
     res
-    .json({statusCode: error,
-        message: error.message});
+    .json({message: error});
   }
   next()
 }

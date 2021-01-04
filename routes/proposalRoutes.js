@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const officeResolver = require("../resolvers/officeResolver");
-const responseStatus = require("../../config/responseStatuses");
+const proposalResolver = require("../data/resolvers/proposalResolver");
+const responseStatus = require("../config/responseStatuses");
 
 router.get("/", async (req, res, next) => {
   try {
-    const offices = await officeResolver.getAllOffices();
-    res.status(responseStatus.success).json({ offices });
+    const proposals = await proposalResolver.getAllProposals();
+    res.status(responseStatus.successful).json({ proposals });
   } catch (err) {
     next(err);
   }
@@ -15,8 +15,8 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const office = await officeResolver.getOffice(id);
-    res.status(responseStatus.success).json({ office });
+    const proposal = await proposalResolver.getProposal(id);
+    res.status(responseStatus.successful).json({ proposal });
   } catch (err) {
     if (TypeError) {
       console.log(err);
@@ -30,8 +30,8 @@ router.get("/:id", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   const { body } = req;
   try {
-    const newOfficeDoc = await officeResolver.addOffice(body);
-    res.status(responseStatus.postCreated).json({ newOfficeDoc });
+    const newProposalDoc = await proposalResolver.addProposal(body);
+    res.status(responseStatus.postCreated).json({ newProposalDoc });
   } catch (err) {
     next(err);
   }
@@ -41,8 +41,8 @@ router.put("/:id", async (req, res, next) => {
   const { id } = req.params;
   const { body } = req;
   try {
-    const updatedDoc = await officeResolver.updateOffice(id, body);
-    res.status(responseStatus.success).json({ updatedDoc });
+    const updatedDoc = await proposalResolver.updateProposal(id, body);
+    res.status(responseStatus.successful).json({ updatedDoc });
   } catch (err) {
     next(err);
   }
@@ -51,8 +51,8 @@ router.put("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
-    const deletedRecords = await officeResolver.deleteOffice(id);
-    res.status(responseStatus.success).json({ deletedRecords });
+    const deletedRecords = await proposalResolver.deleteProposal(id);
+    res.status(responseStatus.successful).json({ deletedRecords });
   } catch (err) {
     next(err);
   }
