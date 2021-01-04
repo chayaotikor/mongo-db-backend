@@ -4,15 +4,15 @@ const autopopulate = require("mongoose-autopopulate");
 const judgeSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Name of judge required."],
+    required: [true, "Judge name required."],
   },
   court: {
     type: String,
-    required: [true, "Court that judge serves required."],
+    required: [true, "Court served required."],
   },
-  review: {
-    type: String,
-    required: [true, "Review of judge required."],
+  performanceReview: {
+    type: Buffer,
+    required: [true, "Judge review file required."],
   },
 });
 

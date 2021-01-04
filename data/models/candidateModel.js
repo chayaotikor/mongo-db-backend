@@ -4,30 +4,18 @@ const autopopulate = require("mongoose-autopopulate");
 const candidateSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Name of candidate required."],
+    required: [true, "Candidate name required."],
   },
   requestedOffice: {
     type: Schema.Types.ObjectId,
-    ref: "Office",
-    autopopulate: { select: "title" },
-    required: [true, "Provided office ID is invalid."]
+    ref: 'Office',
+    autopopulate: { select: "officeTitle" },
+    required: [true, "Valid office ID required."],
   },
-  policyPositions:{
-    type: [
-    {
-      dutyIndex: {
-        type: Number ,
-        required: [true, "Index of the duty required."]
-
-      },
-      position: {
-        type: String,
-        required: [true, "Policy position on a specified duty required." ],
-      },
-    },
-    ],
-  required: [true, "Policy positions list required."]
-  }
+  candidateQuestionnaire: {
+    type: Buffer,
+    required: [true, "Candidate questionnaire file required."]
+  },
 });
 
 candidateSchema.plugin(autopopulate);

@@ -1,6 +1,6 @@
 const Candidate = require("../models/candidateModel");
 const Office = require("../models/officeModel");
-const errorHandler = require("../../config/errorHandler");
+const errorHandler = require("../../middleware/errorHandler");
 const responseStatus = require("../../config/responseStatuses");
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getCandidate: async ({ id }) => {
+  getCandidate: async (id) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
@@ -27,17 +27,17 @@ module.exports = {
     }
   },
 
-  addCandidate: async ({ content, officeId }, req) => {
+  addCandidate: async (content, officeId) => {
     const candidateContent = new Candidate({
       name: content.name,
-      policyPositions: content.policyPositions,
+      candidateQuestionnaire: content.candidateQuestionnaire,
       requestedOffice: officeId,
     });
     try {
       if (
         candidateContent.name === "undefined" ||
-          candidateContent.policyPositions === "undefined" ||
-          officeId === "undefined"
+        candidateContent.candidateQuestionnaire === "undefined" ||
+        officeId === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -55,17 +55,16 @@ module.exports = {
     }
   },
 
-  updateCandidate: async ({ content, id }) => {
+  updateCandidate: async (content, id) => {
     try {
       const candidate = await Candidate.findOne({ _id: id });
       if (!candidate) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.name) {
-          candidate.name = content.name;
-        }
-        if (content.policyPositions) {
-          candidate.policyPositions = content.policyPositions;
+        const keys = Object.keys(content);
+        for (let i = 0; i < keys.length; i++) {
+          let property = keys[i];
+          candidate[property] = content[property];
         }
         await candidate.save();
         return { ...candidate._doc };
@@ -75,19 +74,21 @@ module.exports = {
     }
   },
 
-  deleteCandidate: async ({ candidateId, officeId }) => {
+  deleteCandidate: async (candidateId, officeId) => {
     try {
-      const candidate = await Candidate.findOne({ _id: candidateId });
+      const candidate = await Candidate.deleteOne({ _id: candidateId });
       const office = await Office.findById(officeId);
 
-      if (!candidate) {
+      if (candidate.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
-        candidate.remove();
+        office.candidates = office.candidates.filter((candidate) => {
+          return candidate._id !== candidateId;
+        });
         await office.save();
-        return { ...office._doc };
+        return { office, candidate };
       }
     } catch (err) {
       errorHandler(err);

@@ -1,5 +1,7 @@
-const Office = require("../models/officeModel")
-const errorHandler = require("../../config/errorHandler")
+const Office = require("../models/officeModel");
+const Candidate = require("../models/candidateModel")
+const errorHandler = require("../../middleware/errorHandler");
+const responseStatus = require("../../config/responseStatuses")
 
 module.exports = {
   getAllOffices: async () => {
@@ -13,7 +15,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getOffice: async ({ id }) => {
+  getOffice: async (id) => {
     try {
       const office = await Office.findOne({ _id: id });
       if (!office) {
@@ -25,16 +27,16 @@ module.exports = {
     }
   },
 
-  addOffice: async ({ content }) => {
+  addOffice: async (content) => {
     const officeContent = new Office({
-      title: content.title,
-      duties: content.duties,
+      officeTitle: content.officeTitle,
+      officeDuties: content.officeDuties,
       candidates: [],
     });
     try {
       if (
-        officeContent.title === "undefined" ||
-        officeContent.duties === "undefined"
+        officeContent.officeTitle === "undefined" ||
+        officeContent.officeDuties === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -46,20 +48,16 @@ module.exports = {
     }
   },
 
-  updateOffice: async ({ content, id }) => {
+  updateOffice: async (content, id) => {
     try {
       const office = await Office.findOne({ _id: id });
       if (!office) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.title) {
-          office.title = content.title;
-        }
-        if (content.duties) {
-          office.duties = content.duties;
-        }
-        if (content.candidates) {
-          office.candidates = content.candidates;
+        const keys = Object.keys(content);
+        for (let i = 0; i < keys.length; i++) {
+          let property = keys[i];
+          office[property] = content[property];
         }
         await office.save();
         return { ...office._doc };
@@ -69,13 +67,16 @@ module.exports = {
     }
   },
 
-  deleteOffice: async ({ officeId }) => {
+  deleteOffice: async (officeId) => {
     try {
-      const office = await Office.findOne({ _id: officeId });
-      if (!office) {
+      const office = await Office.deleteOne({ _id: officeId });
+      if (office.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else {
-        office.remove();
+        const candidates = await Candidate.deleteMany({ requestedOffice: officeId });
+        
+
+        return {office, candidates};
       }
     } catch (err) {
       errorHandler(err);

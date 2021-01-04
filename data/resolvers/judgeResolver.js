@@ -1,5 +1,5 @@
 const Judge = require("../models/judgeModel");
-const errorHandler = require("../../config/errorHandler");
+const errorHandler = require("../../middleware/errorHandler");
 const responseStatus = require("../../config/responseStatuses");
 
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getJudge: async ({ id }) => {
+  getJudge: async (id) => {
     try {
       const judge = await Judge.findOne({ _id: id });
       if (!judge) {
@@ -26,17 +26,17 @@ module.exports = {
     }
   },
 
-  addJudge: async ({ content }) => {
+  addJudge: async (content) => {
     const judgeContent = new Judge({
       name: content.name,
       court: content.court,
-      review: content.review,
+      performanceReview: content.performanceReview,
     });
     try {
       if (
         judgeContent.name === "undefined" ||
         judgeContent.court === "undefined" ||
-        judgeContent.review === "undefined"
+        judgeContent.performanceReview === "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -48,21 +48,17 @@ module.exports = {
     }
   },
 
-  updateJudge: async ({ content, id }) => {
+  updateJudge: async (content,id) => {
     try {
       const judge = await Judge.findOne({ _id: id });
       if (!judge) {
         errorHandler(responseStatus.notFound);
       } else {
-        if (content.name) {
-          judge.name = content.name;
-        }
-        if (content.court) {
-          judge.court = content.court;
-        }
-        if (content.review) {
-          judge.review = content.review;
-        }
+          const keys = Object.keys(content);
+          for (let i = 0; i < keys.length; i++) {
+            let property = keys[i];
+            judge[property] = content[property];
+          }
         await judge.save();
         return { ...judge._doc };
       }
@@ -71,13 +67,14 @@ module.exports = {
     }
   },
 
-  deleteJudge: async ({ judgeId }) => {
+  deleteJudge: async (judgeId) => {
     try {
-      const judge = await Judge.findOne({ _id: judgeId });
-      if (!judge) {
+      const judge = await Judge.deleteOne({ _id: judgeId });
+      if (judge.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else {
-        judge.remove();
+
+        return judge
       }
     } catch (err) {
       errorHandler(err);

@@ -1,183 +1,128 @@
 const { assert, expect } = require("chai");
+const mongoose = require("mongoose");
 const Office = require("../officeModel");
 const Candidate = require("../candidateModel");
-
-
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 describe("Candidate Model Tests", () => {
-    let officeId;
-    before((done) => {
-      const office = Office({
-        title: "State Representative",
-        duties: [
-          "Imporant things",
-          "More important things",
-          "Very very important things",
-        ],
-        candidates: [],
-      });
-      office.save().then((res) => {
-        officeId = res._id;
-        done();
+  const candidateExample = {
+    name: "Joe Schmoe",
+    requestedOffice: null,
+    candidateQuestionnaire: fs.readFileSync(
+      path.resolve(__dirname, "../../../pdfs/example__questionnaire_1.pdf")
+    ),
+  };
+  before((done) => {
+    const office = Office({
+      officeTitle: "Senator",
+      officeDuties: fs.readFileSync(
+        path.resolve(__dirname, "../../../pdfs/state_senator_duties.pdf")
+      ),
+      candidates: [],
     });
+    office.save().then((res) => {
+      candidateExample.requestedOffice = res._id;
+      done();
     });
-    //POSITIVE TESTS
-    it("Should save a correctly formatted candidate and return the doc", async () => {
-    const newCandidate = Candidate({
-      name: "Joe Schmoe",
-      requestedOffice: officeId,
-      policyPositions: [
-        { dutyIndex: 0, position: "I will do this very well" },
-        { dutyIndex: 1, position: "I will also do this thing well" },
-        { dutyIndex: 2, position: "This one I will do the best" },
-      ],
+  });
+  after((done) => {
+    mongoose.connection.collections["candidates"].drop((err) => {
+      if (err) console.log(err);
     });
+    mongoose.connection.collections["offices"].drop((err) => {
+      if (err) console.log(err);
+      done();
+    });
+  });
+  //POSITIVE TESTS
+  it("Should save a correctly formatted candidate and return the doc", async () => {
+    const newCandidate = Candidate(candidateExample);
+
+    let result = await newCandidate.save();
+    let testHash1 = crypto.createHash("sha256");
+    testHash1.update(result.candidateQuestionnaire);
+    let questionnaireResultHex = testHash1.digest("hex");
+
+    let testHash2 = crypto.createHash("sha256");
+    testHash2.update(
+      fs.readFileSync(
+        path.resolve(__dirname, "../../../pdfs/example__questionnaire_1.pdf")
+      )
+    );
+    let expectedResultHex = testHash2.digest("hex");
+
     try {
-        let result = await newCandidate.save();
       assert.equal(result.name, "Joe Schmoe");
-      assert.equal(result.requestedOffice.title, "State Representative");
-      assert.equal(result.policyPositions[0].position, "I will do this very well");
-      assert.equal(result.policyPositions[1].position, "I will also do this thing well");
-      assert.equal(result.policyPositions[2].position, "This one I will do the best");
+      assert.equal(result.requestedOffice.officeTitle, "Senator");
+      assert.equal(questionnaireResultHex, expectedResultHex);
     } catch (error) {
       assert(false, error.message);
     }
-    });
-    
-    //NEGATIVE TESTS
-    it("Should NOT allow validation of candidates with undefined names", async () => {
-         const missingName = Candidate({
-           name: "",
-           requestedOffice: officeId,
-           policyPositions: [
-             { dutyIndex: 0, position: "I will do this very well" },
-             { dutyIndex: 1, position: "I will also do this thing well" },
-             { dutyIndex: 2, position: "This one I will do the best" },
-           ],
-         });
-        try {
-            await missingName.validate()
-            assert(false, "Allowed validation of candidate with empty name string")
-        } catch (err) {
-            assert.equal(err.errors.name, "Name of candidate required.");
-        }
-    })
-    it("Should NOT allow validation of a candidate with an undefined office ID", async () => {
+  });
 
-                 const invalidOffice = Candidate({
-                   name: "John Doe",
-                   requestedOffice: undefined,
-                   policyPositions: [
-                     { dutyIndex: 0, position: "I will do this very well" },
-                     {
-                       dutyIndex: 1,
-                       position: "I will also do this thing well",
-                     },
-                     { dutyIndex: 2, position: "This one I will do the best" },
-                   ],
-                 });
-        try {
-            await invalidOffice.validate()
-            
-            assert(false, "Allowed validation of an undefined office ID.")
-        } catch (err) {
-            assert.equal(err.errors.requestedOffice, "Provided office ID is invalid.")
-        }
-    })
-    it("Should NOT allow validation of a candidate with an office ID that does not exist", async () => {
+  //NEGATIVE TESTS
+  it("Should NOT allow validation of a candidate with an undefined name", async () => {
+    let clonedCandidate = Object.assign({}, candidateExample);
+    clonedCandidate.name = undefined;
+    const missingName = Candidate(clonedCandidate);
 
-                 const invalidOffice = Candidate({
-                   name: "Jane Doe",
-                   requestedOffice: "12fh2",
-                   policyPositions: [
-                     { dutyIndex: 0, position: "I will do this very well" },
-                     {
-                       dutyIndex: 1,
-                       position: "I will also do this thing well",
-                     },
-                     { dutyIndex: 2, position: "This one I will do the best" },
-                   ],
-                 });
-        try {
-            await invalidOffice.validate()
-            
-            assert(false, "Allowed validation of an undefined office ID.")
-        } catch (err) {
-            assert.equal(err.errors.requestedOffice, "CastError: Cast to ObjectId failed for value \"12fh2\" at path \"requestedOffice\"")
-        }
-    })
-    it('Should NOT allow validation of a candidate without a policy position array', async () => {
-        const emptyPolicyPositions = Candidate({
-          name: "Jane Doe",
-          requestedOffice: officeId,
-          policyPositions: null,
-        });
+    try {
+      await missingName.validate();
+      assert(false, "Allowed validation of candidate with empty name string");
+    } catch (err) {
+      assert.equal(err.errors.name, "Candidate name required.");
+    }
+  });
 
-        try {
-            await emptyPolicyPositions.validate()
-            assert(false, "Allowed validation of a candidate with an empty policy position list.")
-        } catch (err) {
-            assert.equal(
-              err.errors.policyPositions,
-              "Policy positions list required."
-            );
-        }
-    })
-    it('Should NOT allow validation of a candidate whose policy positions list contains undefined duty indexes', async () => {
-                const missingDutyIndex = Candidate({
-                  name: "Jane Doe",
-                  requestedOffice: officeId,
-                  policyPositions: [
-                    {
-                      dutyIndex: 0,
-                      position:
-                        "I would be awesome at this because reasons.",
-                    },
-                    {
-                      dutyIndex: undefined,
-                      position:
-                        "I would do this duty the best anyone ever has!",
-                    },
-                  ],
-                });
-        
-        try {
-            await missingDutyIndex.validate()
-            assert(false, "Allowed validation of a candidate with undefined duty indexes")
-        } catch (err) {
-            assert.equal(
-              err.errors["policyPositions.1.dutyIndex"],
-              "Index of the duty required."
-            );
-        }
-    })
-    it('Should NOT allow validation of a candidate whose policy positions list contains undefined positions', async () => {
-                const missingDutyIndex = Candidate({
-                  name: "Jill Doe",
-                  requestedOffice: officeId,
-                  policyPositions: [
-                    {
-                      dutyIndex: 0,
-                      position:
-                        "",
-                    },
-                    {
-                      dutyIndex: 1,
-                      position:
-                        "I would do this duty the best anyone ever has!",
-                    },
-                  ],
-                });
-        
-        try {
-            await missingDutyIndex.validate()
-            assert(false, "Allowed validation of a candidate with undefined policy positions")
-        } catch (err) {
-            assert.equal(
-              err.errors["policyPositions.0.position"],
-              "Policy position on a specified duty required."
-            );
-        }
-    })
+  it("Should NOT allow validation of a candidate with an undefined office ID", async () => {
+    let clonedCandidate = Object.assign({}, candidateExample);
+    clonedCandidate.requestedOffice = undefined;
+    const undefinedOffice = Candidate(clonedCandidate);
 
+    try {
+      await undefinedOffice.validate();
+
+      assert(false, "Allowed validation of an undefined office ID.");
+    } catch (err) {
+      assert.equal(err.errors.requestedOffice, "Valid office ID required.");
+    }
+  });
+
+  it("Should NOT allow validation of a candidate with an office ID that does not exist", async () => {
+    let clonedCandidate = Object.assign({}, candidateExample);
+    clonedCandidate.requestedOffice = "123";
+    const invalidOffice = Candidate(clonedCandidate);
+
+    try {
+      await invalidOffice.validate();
+
+      assert(false, "Allowed validation of an undefined office ID.");
+    } catch (err) {
+      assert.equal(
+        err.errors.requestedOffice,
+        'CastError: Cast to ObjectId failed for value "123" at path "requestedOffice"'
+      );
+    }
+  });
+
+  it("Should NOT allow validation of a candidate without a candidate questionnaire file", async () => {
+    let clonedCandidate = Object.assign({}, candidateExample);
+    clonedCandidate.candidateQuestionnaire = undefined;
+    const undefinedQuestionnaire = Candidate(clonedCandidate);
+
+    try {
+      await undefinedQuestionnaire.validate();
+      assert(
+        false,
+        "Allowed validation of a candidate with an undefined candidate questionnaire."
+      );
+    } catch (err) {
+      assert.equal(
+        err.errors.candidateQuestionnaire,
+        "Candidate questionnaire file required."
+      );
+    }
+  });
 });

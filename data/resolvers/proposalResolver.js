@@ -1,5 +1,5 @@
 const Proposal = require("../models/proposalModel");
-const errorHandler = require("../../config/errorHandler");
+const errorHandler = require("../../middleware/errorHandler");
 
 module.exports = {
   getAllProposals: async () => {
@@ -13,7 +13,7 @@ module.exports = {
       errorHandler(err);
     }
   },
-  getProposal: async ({ id }) => {
+  getProposal: async (id) => {
     try {
       const proposal = await Proposal.findOne({ _id: id });
       if (!proposal) {
@@ -25,39 +25,17 @@ module.exports = {
     }
   },
 
-  addProposal: async ({ content }) => {
+  addProposal: async (content) => {
     const proposalContent = new Proposal({
-      name: content.name,
-      approvalEffect: content.approvalEffect,
-      details: {
-        explanation: content.details.explanation,
-        analysis: content.details.analysis,
-      },
-      arguments: {
-        proponentSummary: content.arguments.proponentSummary,
-        proponentDetailed: content.arguments.proponentDetailed,
-        opponentSummary: content.arguments.opponentSummary,
-        opponentDetailed: content.arguments.opponentDetailed,
-        },
-        language: {
-            title: content.language.title,
-            text: content.language.text
-        },
-        fiscalImpact: content.fiscalImpact
+      proposalName: content.proposalName,
+      proposalDetails: content.proposalDetails,
+      proposalLanguage: content.proposalLanguage
     });
     try {
       if (
-        proposalContent.name === "undefined" ||
-        proposalContent.approvalEffect === "undefined" ||
-        proposalContent.details.explanation === "undefined" ||
-        proposalContent.details.analysis === "undefined" ||
-        proposalContent.arguments.proponentSummary === "undefined" ||
-        proposalContent.arguments.proponentDetailed === "undefined" ||
-        proposalContent.arguments.opponentSummary === "undefined" ||
-        proposalContent.arguments.opponentDetailed === "undefined" || 
-        proposalContent.language.title === "undefined" || 
-        proposalContent.language.text === "undefined" || 
-        proposalContent.fiscalImpact === "undefined" 
+        proposalContent.proposalName === "undefined" ||
+        proposalContent.proposalDetails === "undefined" ||
+        proposalContent.proposalLanguage == "undefined"
       ) {
         errorHandler(responseStatus.badRequest);
       }
@@ -69,7 +47,7 @@ module.exports = {
     }
   },
 
-  updateProposal: async ({ content, id }) => {
+  updateProposal: async (content, id) => {
     try {
       const proposal = await Proposal.findOne({ _id: id });
       if (!proposal) {
@@ -88,13 +66,13 @@ module.exports = {
     }
   },
 
-  deleteProposal: async ({ proposalId }) => {
+  deleteProposal: async (proposalId) => {
     try {
-      const proposal = await Proposal.findOne({ _id: proposalId });
-      if (!proposal) {
+      const proposal = await Proposal.deleteOne({ _id: proposalId });
+      if (proposal.deletedCount !== 1) {
         errorHandler(responseStatus.notFound);
       } else {
-        proposal.remove();
+        return {...proposal}
       }
     } catch (err) {
       errorHandler(err);
